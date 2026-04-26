@@ -9,6 +9,7 @@ export default withMermaid(defineConfig({
   lang: "zh-CN",
   title: "JLUCraft",
   description: "吉林大学 Minecraft 同好会",
+  base: "/docs/",
   head: [
     ["link", { rel: "icon", href: "/favicon.png" }],
     ["meta", { name: "theme-color", content: "#5c7cfa" }],
