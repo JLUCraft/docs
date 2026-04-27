@@ -1,6 +1,6 @@
 # 主机抽象层 (HAL)
 
-HAL 把"运行 MC 服务"抽象成统一的 `Instance` 概念，屏蔽 Docker、网络、存储的差异，给业务层暴露简洁的生命周期 API。
+HAL 以统一的 `Instance` 概念抽象"运行 MC 服务"，屏蔽 Docker、网络、存储的差异，向业务层提供简洁的生命周期 API。
 
 ## 核心抽象：`Instance`
 

@@ -1,6 +1,6 @@
 # 网络层
 
-JLUCraft 的网络层用 **libp2p + QUIC** 构建，把分散在校园网与公网的节点拼成一张可寻址、可穿透、低延迟的对等网。
+JLUCraft 的网络层用 **libp2p + QUIC** 构建，将分散在校园网与公网的节点组成一张可寻址、可穿透、低延迟的对等网。
 
 ## 核心协议栈
 
@@ -70,7 +70,7 @@ flowchart TB
 
 ## 多径连接
 
-对于"服务器在校园网 + 用户也在校园网"的场景，用 **QUIC Connection Migration + multipath extension**：
+服务器和用户都在校园网时，用 **QUIC Connection Migration + multipath extension**：
 
 - 客户端同时维护多条路径（WiFi + 有线 / 不同接口）
 - 路径探测：每条路径独立发送 keepalive，测量 RTT

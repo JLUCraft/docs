@@ -1,6 +1,6 @@
 # 网络引擎与实例代理
 
-启动器在 UI 启动前异步初始化 libp2p Host，并启动一个本地 TCP 代理把 MC 客户端"无修改"地接入对等网。这两个模块共同把"原版 MC 连接 localhost:port"等价于"加入运行在远端某节点上的实例"。
+启动器在 UI 启动前异步初始化 libp2p Host，并启动一个本地 TCP 代理，让 MC 客户端"无修改"地接入对等网。这两个模块共同实现了"原版 MC 连接 localhost:port"等价于"加入远端某节点上的实例"。
 
 ## libp2p Host 配置
 
@@ -101,7 +101,7 @@ sequenceDiagram
 
 ## 多实例并发
 
-玩家可能同时打开多个 MC 窗口(主存档 + 联赛对战房),代理为每个窗口分配独立的会话（ProxySession），记录实例 ID、本地端口、MC 进程 ID、承载该实例的服务器节点 PeerID、子流 ID、连接状态（connecting / active / migrating / closed），以及进出字节数。
+玩家可能同时打开多个 MC 窗口（主存档 + 联赛对战房），代理为每个窗口分配独立的会话（ProxySession），记录实例 ID、本地端口、MC 进程 ID、服务器节点 PeerID、子流 ID、连接状态（connecting / active / migrating / closed）和进出字节数。
 
 会话表对外不暴露，但"我的页 → 网络诊断"会以表格形式展示当前所有活跃 session,排查多开冲突时直接看这张表。
 
@@ -112,7 +112,7 @@ sequenceDiagram
 1. 旧 substream 收到 `migration_pending` 控制帧 → 代理标记 session 为 `migrating`
 2. 代理重新查 DHT，拿到新的 PeerID
 3. 与新节点建立 QUIC + substream(若 5 分钟内有缓存连接则免握手)
-4. 把已经发送但未确认的字节重发，然后切换字节流
+4. 将已发送但未确认的字节重发，然后切换字节流
 5. session 切回 `active`,MC 客户端只感受到 1–3 秒的网络抖动
 
 如果新节点暂时不可达，代理会在本地缓存 30 秒待发字节，期间 MC 客户端只显示卡顿；超时后才向 MC 抛出连接重置，触发"返回主界面"。

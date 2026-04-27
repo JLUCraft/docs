@@ -1,10 +1,10 @@
 # 治理层
 
-治理层把"谁有权做什么"用密码学固化下来。**硬编码公钥 + 多签 + W3C VC** 三件套构成完整的信任链。
+治理层用密码学固化"谁有权做什么"的规则。**硬编码公钥 + 多签 + W3C VC** 三件套构成完整的信任链。
 
 ## 硬编码公钥与多签
 
-Genesis 配置（硬编码于源码）包含核心管理成员公钥和 2/3 多签阈值——任意两名核心成员签名即可通过提案。
+Genesis 配置（硬编码于源码）包含核心管理成员公钥和**默认多签阈值 2/3**。多签阈值及各类提案的门槛可通过 `update_governance_params` 提案动态调整，该类型提案本身需要 **≥ 3/4 社长签名（或全体一致）+ 48 小时冷静期**。
 
 ### 多签指令流程
 
@@ -32,7 +32,7 @@ sequenceDiagram
 | 字段 | 类型 | 说明 |
 | ---- | ---- | ---- |
 | id | UUID | 提案唯一标识 |
-| type | 枚举 | add_node / remove_node / update_config / grant_admin / revoke_admin / payout_reward |
+| type | 枚举 | add_node / remove_node / update_config / grant_admin / revoke_admin / payout_reward / update_governance_params |
 | payload | 任意 | 提案具体参数 |
 | proposer | PeerID | 提议者身份 |
 | expires_at | 时间戳 | 过期时间 |
