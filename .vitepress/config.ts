@@ -95,7 +95,7 @@ export default withMermaid(defineConfig({
       copyright: "Copyright © 2026 JLUCraft",
     },
     editLink: {
-      pattern: "https://github.com/JLUCraft/docs/edit/main/docs/pages/:path",
+      pattern: "https://github.com/JLUCraft/docs/edit/main/pages/:path",
       text: "在 GitHub 上编辑此页",
     },
     docFooter: {
