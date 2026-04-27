@@ -6,13 +6,15 @@
   "scripts": {
     "dev": "vitepress dev",
     "build": "vitepress build",
-    "preview": "vitepress preview"
+    "preview": "vitepress preview",
+    "deploy": "vitepress build && wrangler deploy"
   },
   "devDependencies": {
     "@nolebase/vitepress-plugin-inline-link-preview": "^2.18.2",
     "@nolebase/vitepress-plugin-sidebar": "^2.18.2",
     "mermaid": "^10.9.1",
     "vitepress": "^1.6.3",
-    "vitepress-plugin-mermaid": "^2.0.17"
+    "vitepress-plugin-mermaid": "^2.0.17",
+    "wrangler": "^4.85.0"
   }
 }
