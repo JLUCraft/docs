@@ -1,6 +1,6 @@
 # 业务层
 
-业务层将网络层和 HAL 的能力组装成"产品级"功能:实例生命周期管理、自动恢复、持久化策略。上层(管理终端、启动器)直接对接这一层。
+业务层将网络层和 HAL 的能力组装成"产品级"功能：实例生命周期管理、自动恢复、持久化策略。上层（管理终端、启动器）直接对接这一层。
 
 ## 实例编排引擎
 
@@ -15,7 +15,7 @@
 
 ## 自动恢复流程
 
-主机宕机后服务在 30 秒内重新可用:
+主机宕机后服务在 30 秒内重新可用：
 
 ```mermaid
 sequenceDiagram
@@ -28,7 +28,7 @@ sequenceDiagram
     participant C as 客户端
 
     A--xRaft: 心跳超时(>3s)
-    Raft->>Raft: 共识:标记 A 上实例为 degraded
+    Raft->>Raft: 共识：标记 A 上实例为 degraded
     Raft->>Sched: 触发重新调度
     Sched->>Sched: 按 placement 选候选
     Sched->>B: 选定为新宿主
@@ -49,9 +49,9 @@ S3 是**唯一可靠的持久化后端**。本地磁盘仅作缓存。
 
 | 数据类别 | 写入策略 | S3 路径 |
 | -------- | -------- | ------- |
-| 世界数据 | 增量备份,每 5 分钟一次 | `worlds/{world_id}/snapshots/{timestamp}/` |
+| 世界数据 | 增量备份，每 5 分钟一次 | `worlds/{world_id}/snapshots/{timestamp}/` |
 | 配置 | 每次修改即时写入 | `configs/{service_id}/` |
 | 玩家数据 | 玩家离线时写入 | `players/{uuid}/` |
-| WAL(预写日志) | 服务运行时持续写入,崩溃恢复的最后保障 | `wal/{instance_id}/` |
+| WAL（预写日志） | 服务运行时持续写入，崩溃恢复的最后保障 | `wal/{instance_id}/` |
 
-兼容 S3 协议的后端均可接入:**AWS S3 / Cloudflare R2 / MinIO**。
+兼容 S3 协议的后端均可接入：**AWS S3 / Cloudflare R2 / MinIO**。

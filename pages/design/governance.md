@@ -4,16 +4,16 @@
 
 ## 硬编码公钥与多签
 
-Genesis 配置(硬编码于源码)包含三个社团社长公钥和 2/3 多签阈值——任意两个社长签名即可通过提案。
+Genesis 配置（硬编码于源码）包含核心管理成员公钥和 2/3 多签阈值——任意两名核心成员签名即可通过提案。
 
 ### 多签指令流程
 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant P1 as 社长 A (提议者)
-    participant P2 as 社长 B
-    participant P3 as 社长 C
+    participant P1 as 管理成员 A (提议者)
+    participant P2 as 管理成员 B
+    participant P3 as 管理成员 C
     participant Raft as 共识组
 
     P1->>Raft: 创建 Proposal + 自签
@@ -27,7 +27,7 @@ sequenceDiagram
     Raft-->>P3: 广播执行结果
 ```
 
-提案包含以下字段:
+提案包含以下字段：
 
 | 字段 | 类型 | 说明 |
 | ---- | ---- | ---- |
@@ -42,17 +42,17 @@ sequenceDiagram
 
 ```mermaid
 flowchart TB
-  P["President · 硬编码公钥<br/>权限: ALL<br/>多签提案/签名 · 添加管理员<br/>修改系统配置 · 启停任意服务"]
-  A["Admin · 多签任命<br/>权限: ADMIN<br/>管理本社节点 · 启停本社实例<br/>创建比赛 · 发放积分"]
-  M["Member · 管理员验证<br/>权限: BASIC<br/>查看服务器 · 创建房间<br/>加入服务 · 参与比赛"]
+  P["President · 硬编码公钥<br/>权限：ALL<br/>多签提案/签名 · 添加管理员<br/>修改系统配置 · 启停任意服务"]
+  A["Admin · 多签任命<br/>权限：ADMIN<br/>管理本社节点 · 启停本社实例<br/>创建比赛 · 发放积分"]
+  M["Member · 管理员验证<br/>权限：BASIC<br/>查看服务器 · 创建房间<br/>加入服务 · 参与比赛"]
 
   P -->|任命/罢免| A
   A -->|验证| M
 ```
 
-## 身份凭证:W3C Verifiable Credential
+## 身份凭证：W3C Verifiable Credential
 
-社员 VC 包含以下信息:
+社员 VC 包含以下信息：
 
 | 字段 | 内容 |
 | ---- | ---- |
@@ -71,8 +71,8 @@ flowchart LR
   MC -->|player 出示| Verify[节点离线验证]
 ```
 
-玩家登录时出示 VC,**任何节点可离线验证链上信任关系**。
+玩家登录时出示 VC，**任何节点可离线验证链上信任关系**。
 
 ::: warning 吊销机制
-吊销列表通过 DHT 全网同步。VC 的有效性在首次连接任意服务器节点时验证,本地缓存吊销列表降低延迟。
+吊销列表通过 DHT 全网同步。VC 的有效性在首次连接任意服务器节点时验证，本地缓存吊销列表降低延迟。
 :::

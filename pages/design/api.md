@@ -1,6 +1,6 @@
 # 接口设计
 
-对外接口分四组:**libp2p 协议(节点间)**、**启动器内部 API**、**管理终端 API**、**事件总线**。
+对外接口分四组：**libp2p 协议（节点间）**、**启动器内部 API**、**管理终端 API**、**事件总线**。
 
 ## libp2p 协议定义 (Protobuf)
 
@@ -48,15 +48,15 @@
 
 ## 启动器内部 API
 
-启动器进程内部用本地 gRPC,UI 与 Core Engine 解耦:
+启动器进程内部用本地 gRPC，UI 与 Core Engine 解耦：
 
 | 方法 | 功能 |
 | ---- | ---- |
 | Login | 登录获取本地身份 |
 | CreateIdentity | 生成 PeerID + ed25519 密钥对 |
 | ListAvailableInstances | 按筛选条件查询实例列表(含延迟和在线人数) |
-| JoinInstance | 加入实例,返回本地代理端口(MC 连接 localhost:port) |
-| CreateQuickRoom | 快速创建房间,返回实例 ID |
+| JoinInstance | 加入实例，返回本地代理端口(MC 连接 localhost:port) |
+| CreateQuickRoom | 快速创建房间，返回实例 ID |
 | InvitePlayers | 邀请其他玩家加入房间 |
 
 ## 管理终端 API
@@ -65,8 +65,8 @@
 | ---- | ---- | ---- |
 | GetClusterHealth | 监控 | 查询集群健康状态(节点、实例、告警) |
 | SubscribeAlerts | 监控 | 订阅实时告警流 |
-| ExecuteCommand | 操作 | 发起管理命令,返回推送授权 Challenge |
-| RespondChallenge | 操作 | 提交 TEE 签名响应 Challenge,执行命令 |
+| ExecuteCommand | 操作 | 发起管理命令，返回推送授权 Challenge |
+| RespondChallenge | 操作 | 提交 TEE 签名响应 Challenge，执行命令 |
 | ListMembers | 成员管理 | 按社团筛选成员列表(含角色和 VC 状态) |
 | GrantRole | 成员管理 | 授予角色并签发 VC |
 | QueryAuditLog | 审计 | 按筛选条件查询审计日志 |
@@ -85,6 +85,6 @@
 | `mc.events.admin.push` | 推送授权请求 | 指定管理员 |
 
 ::: tip 频道命名约定
-- 层级结构 `mc.events.<domain>.<id?>`,便于通配符订阅。
-- `{id}` 占位允许只订阅特定实例/比赛,避免噪声。
+- 层级结构 `mc.events.<domain>.<id?>`，便于通配符订阅。
+- `{id}` 占位允许只订阅特定实例/比赛，避免噪声。
 :::

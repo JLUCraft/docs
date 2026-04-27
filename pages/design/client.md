@@ -1,6 +1,6 @@
 # 客户端架构
 
-客户端分两种:面向玩家的**启动器**和面向管理员的**管理终端**。两者共用底层网络与身份能力,UI 与权限模型不同。
+客户端分两种：面向玩家的**启动器**和面向管理员的**管理终端**。两者共用底层网络与身份能力，UI 与权限模型不同。
 
 ## 启动器架构
 
@@ -40,19 +40,19 @@ sequenceDiagram
     participant Host as 目标主机
 
     MC->>Proxy: 连接 localhost:25565
-    Proxy->>Proxy: 解析 MC 握手包,获取 instance_id
+    Proxy->>Proxy: 解析 MC 握手包，获取 instance_id
     Proxy->>DHT: 查询 instance_id
     DHT-->>Proxy: peerID + multiaddr
     Proxy->>Host: 建立 libp2p QUIC stream
     Host-->>Proxy: 已就绪
-    Proxy<<->>MC: 透传 MC 协议数据
+    Proxy<->>MC: 透传 MC 协议数据
 ```
 
-玩家选中服务器,点击"加入"即可。**不需要手动输入 IP:端口**。
+玩家选中服务器，点击"加入"即可。**不需要手动输入 IP:端口**。
 
 ## 管理终端
 
-独立于启动器,面向管理员。完整功能模块见 [管理终端组件文档](../components/manager/index.md),顶层结构如下:
+独立于启动器，面向管理员。完整功能模块见 [管理终端组件文档](../components/manager/index.md),顶层结构如下：
 
 ```mermaid
 flowchart LR
@@ -79,7 +79,7 @@ flowchart LR
 
 ### 推送授权机制
 
-管理终端与服务器节点之间的敏感操作都走推送 + TEE 签名:
+管理终端与服务器节点之间的敏感操作都走推送 + TEE 签名：
 
 ```mermaid
 sequenceDiagram
@@ -90,7 +90,7 @@ sequenceDiagram
 
     Admin->>Srv: 触发管理操作
     Srv->>Admin: 推送 AuthChallenge<br/>(libp2p pubsub)
-    Admin->>Admin: 弹出通知:是否批准?
+    Admin->>Admin: 弹出通知：是否批准？
     Admin->>TEE: 生物认证 → 解锁私钥
     TEE-->>Admin: 签名(challenge)
     Admin->>Srv: 提交 SignResponse
@@ -102,8 +102,8 @@ sequenceDiagram
 
 - 管理员的 ed25519 私钥在 **TEE** 中生成
 - macOS:Secure Enclave;Windows:TPM 2.0;Android/iOS:各自安全芯片
-- 私钥永不离开 TEE,签名在 TEE 内完成
-- TEE 生成的公钥注册到链上,与管理员身份绑定
+- 私钥永不离开 TEE，签名在 TEE 内完成
+- TEE 生成的公钥注册到链上，与管理员身份绑定
 
 ::: warning 优势
 设备被盗也无法导出私钥。遗失时通过多签操作吊销对应公钥即可。
