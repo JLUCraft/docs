@@ -2,22 +2,22 @@
 
 服务器节点以 libp2p Host 作为对外入口。启用联合大厅兼容模式时，该节点同时充当 **Lobby Bridge**，对外接入 MUA 联合大厅，对内将流量转换成本系统的实例路由与容器连接。
 
-## 入站代理（两类入口，三种来源）
+## 入站代理
 
-服务器节点支持**两种入站方式**，对应两类玩家：
+服务器节点通过网络接入层的适配器接收外部连接，所有入站流量统一抽象为 `InboundSession`：
 
 ```mermaid
 flowchart LR
-  subgraph A["libp2p 入口 (FollyLauncher)"]
+  subgraph A["LibP2pAdapter (FollyLauncher)"]
     Cli[启动器代理]
     L1[libp2p Host]
     P1[入站代理模块]
   end
 
-  subgraph B["TCP 入口 (标准启动器 + MUA)"]
+  subgraph B["FrpAdapter (标准启动器 + MUA)"]
     Std[HMCL / PCL]
     MUA[MUA API 查询 club]
-    P2[TCP 代理模块]
+    P2[frp 代理模块]
   end
 
   H[本地实例表]
@@ -25,7 +25,7 @@ flowchart LR
 
   Cli -->|"QUIC + libp2p stream"| L1
   L1 -->|substream "/mc/play/1"| P1
-  Std -->|TCP| P2
+  Std -->|"frp 隧道"| P2
   P2 --> MUA
   MUA --> P2
   P1 --> H
@@ -36,7 +36,7 @@ flowchart LR
   P2 -->|TCP| C
 ```
 
-联合大厅流量在活跃桥接节点上终止为一条**虚拟 TCP 会话**，复用同一套 TCP 入口管线。对服务器节点而言，入口类型始终只有 libp2p 和 TCP 两类；TCP 入口同时承载公网直连与联合大厅桥接两种来源。
+联合大厅流量在活跃桥接节点上终止为一条**虚拟 TCP 会话**，复用同一套 frp 入口管线。对服务器节点而言，入口类型始终只有 libp2p 和 frp 两类。
 
 ### libp2p 入口（VC 玩家）
 
@@ -46,9 +46,9 @@ flowchart LR
 3. 验证 PeerID 的 VC 有效性，检查 `admission` 配置
 4. 建立到容器的 TCP 连接
 
-### TCP 入口（MUA 访客）
+### frp 入口（MUA 访客）
 
-标准启动器直连服务器的公网 MC 端口：
+标准启动器通过 frp 隧道接入，SNI 或虚拟主机名携带 `instance_id`：
 
 1. MC 握手解析 —— 从 Server Address 字段提取 `instance_id`
 2. Login Start 解析 —— 读取 MC Login Start 包，提取玩家 `username`
@@ -64,7 +64,7 @@ flowchart LR
 
 桥接链路如下：
 
-1. 桥接节点选主 —— 多个公网 `consensus` / `relay` 节点可声明承担 Lobby Bridge 角色，但同一时刻只有一个节点持有 `mua_bridge/<cluster>` lease。
+1. 桥接节点选主 —— 多个具备公网可达性的节点可声明承担 Lobby Bridge 角色，但同一时刻只有一个节点持有 `mua_bridge/<cluster>` lease。
 2. 外部隧道建立 —— 活跃桥接节点与 MUA `frps` 建立兼容的 `frp` 控制面 / 数据面连接，承接 JLUCraft 标签下的大厅流量。
 3. 转发元数据解析 —— 解析联合大厅附加的转发元数据（legacy forwarding 字段、玩家 IP、UUID、username、目标 host 等）。
 4. 可信入口校验 —— 使用 Union API 同步的 `entry_list` 校验上游接入点身份，语义上等价于 ProxiedProxy 的 `TrustedEntries.json`。
@@ -72,9 +72,9 @@ flowchart LR
 6. 准入检查 —— 结合转发得到的 UUID / username，查询 Union 资料并执行 `allowed_clubs`、黑白名单和实例状态检查。
 7. 内部桥接 —— 若实例在本地，则直接连接容器；若实例在其他节点，则由桥接节点主动向实例宿主建立 libp2p/QUIC 子流并双向透传字节。
 
-桥接节点只负责接入层语义兼容。实例仍可运行在校园网、宿舍或其他工作节点上，联合大厅仅为它们增加一个统一入口。
+桥接节点只负责接入层语义兼容。实例仍可运行在校园网、宿舍或其他节点上，联合大厅仅为它们增加一个统一入口。
 
-### 联合大厅桥接的去中心化边界
+### 去中心化边界
 
 该路径的边界如下：
 
@@ -106,7 +106,7 @@ sequenceDiagram
     Old->>Old: 查实例表 → 不在本节点
     Old->>DHT: 查实例 X 的当前位置
     DHT-->>Old: peer_id = New
-    alt 节点 A 是 relay 候选 / 同社团
+    alt 节点 A 可达目标节点
         Old->>Cli: redirect(New) + 可选辅助打洞信息
         Cli->>New: 直接重连
     else 节点 A 自愿继续转发
@@ -115,7 +115,7 @@ sequenceDiagram
     end
 ```
 
-第二种桥接分支仅在源节点未承诺保留中继角色时启用，且作用域限于本次会话，避免已迁移的旧节点退化为永久路由热点。
+第二种桥接分支仅在源节点未声明保留中继时启用，且作用域限于本次会话，避免已迁移的旧节点退化为永久路由热点。
 
 联合大厅会话还需遵循一条约束：**不得将内部重定向暴露给玩家客户端**。大厅玩家仅知晓 MUA 入口地址，不应接触 JLUCraft 内部的 PeerID 或实例宿主地址。桥接节点发现目标实例不在本地时，在内部节点间完成二段桥接，对客户端完全透明。
 
@@ -152,13 +152,13 @@ sequenceDiagram
 | DHT 维护 | libp2p stream `/kad/v1` | 周期性 |
 | S3 读写 | HTTPS | 实例运行时按需 |
 | Bootstrap 重连 | libp2p QUIC | 节点启动 + 周期性心跳 |
-| 中继转发 | libp2p stream `/relay/v1` | 仅 relay 角色 |
+| 中继转发 | libp2p stream `/relay/v1` | 仅 NAT 打洞失败时 |
 
 出站方向不施加特殊限制，但所有出站请求均受本地度量。异常出站（连接白名单外的外部端点）会触发告警，帮助运维者及时发现入侵迹象。
 
 ## 共识参与
 
-`consensus` 节点在 libp2p Host 之上跑标准 Raft 协议，日志复制、心跳、选举都封装在 `/raft/v1` substream 里。
+持有 `ConsensusCredential` 的节点在 libp2p Host 之上跑标准 Raft 协议，日志复制、心跳、选举都封装在 `/raft/v1` substream 里。
 
 | 子协议 | substream | 数据 |
 | --- | --- | --- |
@@ -166,17 +166,18 @@ sequenceDiagram
 | 投票 | `/raft/v1/vote` | candidate → 全员 |
 | 快照传输 | `/raft/v1/snapshot` | leader → 落后者，大对象时切到 S3 直链 |
 
-`worker` 节点以 **Learner** 模式只读跟随，不参与投票，但维护日志尾部用于本地决策——例如收到调度命令时，可确认对应日志已被多数派确认并安全执行。
+pending 状态的节点不参与投票，但可观察共识日志尾部用于本地状态同步。一旦获得 `ConsensusCredential` 即升级为 Follower，参与完整 Raft 协议。
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Follower
+    [*] --> Learner: 节点启动（无 ConsensusCredential）
+    [*] --> Follower: 节点启动（持有 ConsensusCredential）
     Follower --> Candidate: 选举超时
     Candidate --> Leader: 多数票
     Candidate --> Follower: 收到更高 term
     Leader --> Follower: 检测到分区或更高 term
-    Follower --> Learner: 角色降级 / worker 启动
-    Learner --> Follower: 角色提升(需提案)
+    Learner --> Follower: 治理层签发 ConsensusCredential
+    Follower --> Learner: 治理层吊销 ConsensusCredential
 ```
 
 每 10000 条日志生成一次快照，快照本身上传到 S3 `consensus/snapshots/<term>-<index>.bin`，Raft 日志条目仅保留指针。新节点先拉取快照再追加增量日志，避免初次同步时耗尽 libp2p 带宽。
@@ -250,7 +251,7 @@ sequenceDiagram
     Srv-->>Mgr: 注册成功
 ```
 
-`push_endpoint` 必须是 unified-push distributor 的 URL（如 `https://gotify.jlucraft.club/UP?...`）。服务器仅支持 `unified-push` distributor_type，统一使用 HTTP POST 推送。
+`push_endpoint` 必须是 unified-push distributor 的 URL（如 `https://gotify.example.com/UP?...`）。服务器仅支持 `unified-push` distributor_type，统一使用 HTTP POST 推送。
 
 ### 推送分发
 

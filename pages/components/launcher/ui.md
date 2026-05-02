@@ -57,7 +57,7 @@ sequenceDiagram
 资源同步流程：
 
 1. 拉取目标实例的 `ResourceManifest`
-2. 对照本地 `~/.jlucraft/resources/<hash>` 缓存，列出缺失文件
+2. 对照本地 `~/.follylauncher/resources/<hash>` 缓存，列出缺失文件
 3. **BitSwap 分块下载**——同时从所有持有该 chunk 的节点拉取
 4. 校验 SHA256，通过则硬链接到 `.minecraft/<path>`
 5. 失败的非 `required` 文件可跳过，玩家手动确认是否继续

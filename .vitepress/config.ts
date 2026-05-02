@@ -30,12 +30,12 @@ export default withMermaid(defineConfig({
         {
           text: "分层设计",
           items: [
-            { text: "网络层", link: "/design/network" },
-            { text: "主机抽象层 (HAL)", link: "/design/hal" },
-            { text: "业务层", link: "/design/business" },
-            { text: "共识层", link: "/design/consensus" },
-            { text: "治理层", link: "/design/governance" },
-            { text: "预言机 & 积分", link: "/design/oracle" },
+            { text: "网络代理层", link: "/design/network" },
+            { text: "主机抽象层", link: "/design/hal" },
+            { text: "游戏业务层", link: "/design/business" },
+            { text: "多方共识层", link: "/design/consensus" },
+            { text: "链上治理层", link: "/design/governance" },
+            { text: "预言机", link: "/design/oracle" },
           ],
         },
         {
@@ -64,7 +64,7 @@ export default withMermaid(defineConfig({
             { text: "概览", link: "/components/server/" },
             { text: "节点初始化", link: "/components/server/bootstrap" },
             { text: "实例生命周期与数据采集", link: "/components/server/lifecycle" },
-            { text: "网络代理层与共识 / 存储", link: "/components/server/network" },
+            { text: "网络代理层与共识", link: "/components/server/network" },
           ],
         },
         {

@@ -1,6 +1,66 @@
 # 节点初始化
 
-节点初始化负责将一台空白主机转变为**已注册、已加入共识组、已就绪承载实例**的服务器节点。运维者只需要写好配置文件、运行二进制，剩下的都由节点自动完成。
+节点初始化负责将一台空白主机转变为**已注册、已加入 DHT、已就绪承载实例**的对等节点。运维者只需运行二进制，剩下的由节点自动完成。
+
+::: warning 零配置原则
+节点不读取任何本地配置文件。所有治理参数（准入规则、调度配置、S3 凭证等）从共识层加载；运行时环境参数（端口、数据目录、Docker socket）由节点自动推导。物理机控制者能做的最坏情况是让节点离线——无法通过修改本地文件提升权限或篡改系统行为。
+:::
+
+## 启动命令
+
+最简情况下，节点无需任何参数：
+
+```bash
+federated-server
+```
+
+跨网段、局域网内无其他节点时，通过命令行参数指定已知节点：
+
+```bash
+federated-server --bootstrap-peers /ip4/1.2.3.4/udp/25566/quic-v1/p2p/QmXxx
+```
+
+这是节点唯一可接受的外部输入。
+
+## 自动推导的运行时参数
+
+节点启动时自动推导所有运行时参数，无需人工配置：
+
+### 监听地址
+
+固定监听 `0.0.0.0:25566`（QUIC/UDP）。公网 IP 和 NAT 类型在启动后自动探测。
+
+### 数据目录
+
+遵照操作系统最佳实践自动选择：
+
+| 操作系统 | 路径 |
+| -------- | ---- |
+| Linux | `$XDG_DATA_HOME/federated-server`（默认 `~/.local/share/federated-server`） |
+| macOS | `~/Library/Application Support/federated-server` |
+| Windows | `%APPDATA%\federated-server` |
+
+数据目录仅存放密钥（`keystore.json`）和本地缓存，不存放任何治理参数。
+
+### Docker socket
+
+按以下顺序探测，首个可用的即采用：
+
+1. `/var/run/docker.sock`（Linux 默认）
+2. `npipe:////./pipe/docker_engine`（Windows 默认）
+3. 环境变量 `DOCKER_HOST`
+4. 探测失败 → 节点以"无实例承载能力"模式运行，仍可参与 DHT 和共识
+
+### 引导节点发现
+
+按以下顺序尝试，首个成功的即停止：
+
+1. **mDNS 局域网广播**：向局域网广播探测，发现同网段内已运行的节点
+2. **命令行参数** `--bootstrap-peers`：若 mDNS 无响应，使用指定的 multiaddr 列表
+
+### S3 凭证
+
+从共识层加载，治理层通过多签提案写入。节点本地不存储任何 S3 凭证。
 
 ## 首次启动流程
 
@@ -10,11 +70,12 @@ sequenceDiagram
     participant Op as 运维者
     participant Node as 节点
     participant FS as 本地磁盘
+    participant mDNS
     participant DHT
     participant Cons as 共识组
 
-    Op->>Node: 启动二进制
-    Node->>FS: 检查 keystore
+    Op->>Node: 启动二进制（无配置文件）
+    Node->>FS: 检查 keystore（数据目录自动推导）
     alt 首次启动
         Node->>Node: 生成 ed25519 密钥对
         Node->>FS: 加密落盘(keystore.json)
@@ -22,91 +83,68 @@ sequenceDiagram
     else 已有密钥
         Node->>FS: 解密加载
     end
-    Node->>Node: 加载 config.toml
-    Node->>DHT: 连接引导节点 + Announce
-    Node->>Node: 探测 NAT 类型 + 公网可达性
-    Node->>Cons: JoinRequest{peer_id, role， labels}
-    alt 在 genesis 列表中
-        Cons-->>Node: 自动批准
-    else 需要多签
-        Cons-->>Node: 等待管理员审批
-        Note over Cons,Node: 这期间节点处于 "pending" 状态
+    Node->>Node: 探测 Docker socket
+    Node->>mDNS: 局域网广播探测
+    alt 发现局域网节点
+        mDNS-->>Node: 已知节点 multiaddr
+    else 无响应
+        Node->>Node: 读取 --bootstrap-peers 参数
     end
-    Cons-->>Node: 加入完成
-    Node->>Node: 进入运行时，开始接受调度
+    Node->>DHT: 连接已知节点 + Announce
+    Node->>Node: 探测 NAT 类型 + 公网可达性
+    Node->>Cons: 发送 JoinRequest{peer_id, resources}
+    Note over Node: 进入 pending 状态<br/>DHT 可见，但不承载实例、不参与投票
+    Cons-->>Node: 等待多签审批
+    Note over Cons,Node: 治理层多签批准后
+    Cons-->>Node: 签发 ConsensusCredential
+    Node->>Cons: 同步最新快照 + 增量日志
+    Node->>Node: 进入运行时，加入 Raft 投票组，开始接受调度
 ```
 
-整个流程通常耗时 10–30 秒。`pending` 状态下节点已经在 DHT 上可见，但调度器不会分配实例给它——这给了管理员审批身份的时间窗口。
+整个流程中，pending 状态可能持续数分钟到数小时，取决于管理员何时审批。pending 期间节点对系统没有任何影响。
 
-## 配置文件
+## 申请加入共识组
 
-节点通过 `config.toml` 声明全部行为。关键配置段落如下：
+节点启动后自动向共识组发送 `JoinRequest`，进入 pending 状态等待多签审批。审批通过后节点一步到位获得全部能力：
 
-| 段落 | 关键字段 | 说明 |
-| ---- | -------- | ---- |
-| `[node]` | `role` | consensus / worker / relay |
-| | `data_dir` | 数据目录 |
-| `[network]` | `listen_addrs` | QUIC 监听地址 |
-| | `public_ips` | 公网 IP（留空则自动探测） |
-| | `nat_type` | auto / public / cone / symmetric |
-| `[bootstrap]` | `peers` | 引导节点 multiaddr 列表 |
-| `[resources]` | `max_cpu_cores` / `max_memory_gb` / `max_disk_gb` | 资源上限 |
-| `[docker]` | `endpoint` | Docker socket 路径 |
-| | `network_mode` | bridge / host |
-| `[storage.s3]` | `endpoint` / `bucket` / `access_key` / `secret_key` | S3 连接信息 |
-| `[labels]` | `club` / `campus` / `tier` / `gpu` | 调度标签 |
+```mermaid
+flowchart TB
+  R[节点发送 JoinRequest<br/>附 PeerID + 资源信息] --> P[治理层创建多签提案]
+  P --> S[等待 ≥ threshold 社长签名]
+  S -->|超时| X[拒绝，节点继续 pending]
+  S -->|通过| V[签发 ConsensusCredential VC]
+  V --> L[节点同步最新快照 + 增量日志]
+  L --> O[加入 Raft 投票组 + 开始承载实例]
+```
 
-配置文件支持热重载（`SIGHUP` 信号或管理终端推送），除 `role`、`data_dir` 等少数项外，其他配置可在不停机的情况下生效。
-
-## 角色细节
-
-[概览](./index#节点角色) 列出了三种角色的职责差异。运维时常踩的坑：
-
-- **`worker` 不参与投票**，但仍然记录共识日志尾部用于本地决策。这意味着断网恢复后它能感知最近的调度变化，而不需要从快照重新追日志
-- **`relay` 节点不需要 Docker**——它仅做 L4 转发。在仅有公网 IP 但无算力的 VPS 上很常见
-- **同一节点不能同时是 `consensus` 与 `relay`**——共识参与对延迟敏感，中继转发对带宽敏感，职责互相干扰
-
-角色变更需要重启节点，且需要管理员通过提案确认(防止运维者私自把高信誉节点降级)。
+撤销只需治理层多签吊销对应 VC，节点立即退出投票组并停止承载新实例，无需登录目标机器操作。
 
 ## 节点标签
 
-`[labels]` 是调度器选择宿主时的关键依据。建议至少声明：
+节点可通过命令行参数声明调度亲和性标签：
+
+```bash
+federated-server --label club=jlucraft --label campus=main --label gpu=true
+```
 
 | 标签 | 用途 |
 | --- | --- |
 | `club` | 所属社团 ID，影响实例的"亲和性" |
 | `campus` | 校园 / 校区，玩家延迟优化 |
-| `tier` | `performance` / `standard` / `economy`,影响调度优先级 |
-| `gpu` | 是否具备 GPU(若有特殊渲染服务) |
+| `gpu` | 是否具备 GPU（若有特殊渲染服务） |
 
-标签是**自由文本** + **共识层校验**的组合：任何节点都可以声明任意标签，但 `tier` 等会影响信誉计算的标签需要管理员通过提案确认，防止节点自抬身价。
-
-## 加入共识组
-
-`consensus` 角色的节点首次启动时，会向共识组发送 `JoinRequest`。共识组的处理逻辑：
-
-```mermaid
-flowchart TB
-  R[收到 JoinRequest] --> G{在 genesis 列表}
-  G -- 是 --> A[自动批准 + 加入投票]
-  G -- 否 --> P[创建多签提案]
-  P --> S[等待 ≥ threshold 社长签名]
-  S -->|超时| X[拒绝]
-  S -->|通过| A
-  A --> L[同步最新快照 + 增量日志]
-  L --> O[节点进入正常状态]
-```
-
-新加入的 `consensus` 节点不会立即获得投票权——它需要先把日志同步到当前 leader 的进度，才能参与下一轮选举。这避免了"刚加入就因日志落后导致投票发散"。
+标签只影响调度亲和性，不影响权限。调度器优先将实例分配到标签匹配的节点，但不强制。
 
 ## 故障重启
 
 节点已经初始化过、再次启动时：
 
 1. 解密 keystore → 恢复 PeerID
-2. 加载 config → 恢复角色与标签
-3. 连接共识组 → 拉取最新快照(若本地快照过旧)
-4. 拉取应当承载的实例清单 → 从 S3 恢复
+2. mDNS / bootstrap-peers → 重新加入 DHT
+3. 检查本地 `ConsensusCredential` 是否有效
+   - 有效 → 连接共识组，拉取最新快照 + 重新加载治理配置，恢复实例承载
+   - 无效或已吊销 → 进入 pending 状态，等待重新审批
+4. 从 S3 恢复应当承载的实例清单
 5. 注册 DHT → 重新接受连接
 
-整个过程通常在 1–2 分钟内完成。如果 S3 暂不可达，节点会进入"降级"状态：已运行的实例继续提供服务，但不接受新的实例调度，直到 S3 恢复。
+整个过程通常在 1–2 分钟内完成。如果共识组暂不可达，节点会进入"降级"状态：已运行的实例继续提供服务，但不接受新的实例调度，直到共识组恢复。
