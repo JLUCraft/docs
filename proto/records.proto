@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package jlucraft.records.v1;
+
+option java_package = "com.jlucraft.records.v1";
+option java_multiple_files = true;
+
+message ResourceAd {
+  string peer_id = 1;
+  repeated string multiaddrs = 2;
+  float available_cpu = 3;
+  uint64 available_memory_mb = 4;
+  uint64 available_disk_mb = 5;
+  uint32 active_instances = 6;
+  double node_score = 7;
+  string updated_at = 8;
+  bytes public_key = 9;
+  bytes signature = 10;
+}
+
+message InstanceRecord {
+  string instance_id = 1;
+  string peer_id = 2;
+  repeated string listen_addrs = 3;
+  string published_at = 4;
+  bytes public_key = 5;
+  bytes signature = 6;
+  optional string proxy_address = 7;
+  repeated string public_ips = 8;
+}
+
+message NodeAnnouncement {
+  string peer_id = 1;
+  string status = 2;
+  string updated_at = 3;
+  bool accept_workloads = 4;
+  bool provide_relay = 5;
+  bool expose_public_ingress = 6;
+  map<string, string> labels = 7;
+  repeated string listen_addrs = 8;
+  repeated string public_ips = 9;
+  uint64 instance_count = 10;
+  uint64 running_instances = 11;
+  string consensus_role = 12;
+  string oracle_report_date = 13;
+  optional string proxy_listen_addr = 14;
+  optional string yggdrasil_listen_addr = 15;
+}
+
+message JoinRequest {
+  string peer_id = 1;
+  bytes public_key = 2;
+  map<string, string> labels = 3;
+  string timestamp = 4;
+  bytes signature = 5;
+}

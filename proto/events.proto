@@ -1,0 +1,179 @@
+syntax = "proto3";
+
+package jlucraft.events.v1;
+
+option java_package = "com.jlucraft.events.v1";
+option java_multiple_files = true;
+
+message EventEnvelope {
+  string event_id = 1;
+  string topic = 2;
+  string event_type = 3;
+  string occurred_at = 4;
+  string source_peer_id = 5;
+  oneof payload {
+    GenericEvent generic = 10;
+    ClusterNodeReady node_ready = 11;
+    ClusterAlertEvent alert = 12;
+    ClusterProposalEvent proposal = 13;
+    ClusterSeasonEvent season = 14;
+    ClusterDeviceEvent device = 15;
+    ClusterAuthChallengeEvent auth_challenge = 16;
+    ClusterOracleReport oracle_report = 17;
+    InstanceUpdateEvent instance_update = 18;
+    InstanceInviteEvent instance_invite = 19;
+    MigrationPending migration_pending = 20;
+    MigrationRedirect migration_redirect = 21;
+    TournamentEvent tournament = 22;
+    MatchEvent match = 23;
+    // reserved 24 (ws_event removed — WebSocket semantics not used in protobuf over libp2p)
+    GovernanceStreamEvent governance_stream = 25;
+    CredentialRevocationEvent credential_revocation = 26;
+    PushNotification push_notification = 27;
+  }
+}
+
+message GenericEvent {
+  string event_type = 1;
+  map<string, string> attributes = 2;
+}
+
+message ClusterNodeReady {
+  string peer_id = 1;
+  bool accept_workloads = 2;
+  bool provide_relay = 3;
+  uint32 bootstrap_peers = 4;
+  string started_at = 5;
+}
+
+message ClusterAlertEvent {
+  string alert_type = 1;
+  string alert_id = 2;
+  string message = 3;
+  string severity = 4;
+}
+
+message ClusterProposalEvent {
+  string proposal_id = 1;
+  string proposal_type = 2;
+  string proposer = 3;
+  uint32 signature_count = 4;
+  string status = 5;
+}
+
+message ClusterSeasonEvent {
+  string season_id = 1;
+  string name = 2;
+  string status = 3;
+}
+
+message ClusterDeviceEvent {
+  string public_key = 1;
+  string owner_peer_id = 2;
+}
+
+message ClusterAuthChallengeEvent {
+  string challenge_id = 1;
+  string cmd_type = 2;
+  string human_summary = 3;
+}
+
+message ClusterOracleReport {
+  string date = 1;
+  uint64 instance_count = 2;
+  string merkle_root = 3;
+}
+
+message InstanceUpdateEvent {
+  string instance_id = 1;
+  string name = 2;
+  string kind = 3;
+  string host_peer_id = 4;
+  string status = 5;
+  string last_snapshot_key = 6;
+  string migration_target = 7;
+  string club = 8;
+  uint32 player_count = 9;
+  string mode = 10;
+  uint32 max_players = 11;
+  string version = 12;
+}
+
+message InstanceInviteEvent {
+  string instance_id = 1;
+  uint32 invited_count = 2;
+  string message = 3;
+  repeated string players = 4;
+}
+
+message MigrationPending {
+  string instance_id = 1;
+  string from_peer_id = 2;
+  string to_peer_id = 3;
+  string reason = 4;
+}
+
+message MigrationRedirect {
+  string instance_id = 1;
+  string target_peer_id = 2;
+  repeated string listen_addrs = 3;
+}
+
+message TournamentEvent {
+  string tournament_id = 1;
+  string name = 2;
+  string game_type = 3;
+  string status = 4;
+}
+
+message MatchEvent {
+  string match_id = 1;
+  string tournament_id = 2;
+  string status = 3;
+  string scheduled_at = 4;
+}
+
+
+
+
+
+message PushNotification {
+  string event_type = 1;
+  string nonce = 2;
+  string intent_id = 3;
+  string created_at = 4;
+  string created_by = 5;
+  string title = 6;
+  string body = 7;
+  string summary = 8;
+  string severity = 9;
+  repeated string suggested_topics = 10;
+  repeated AuthoritativeReference references = 11;
+}
+
+message AuthoritativeReference {
+  string kind = 1;
+  string id = 2;
+}
+
+// InstanceLogEvent carries a single log line from a running instance,
+// emitted on topic "instance.{id}.log" via SubscribeEvents stream.
+message InstanceLogEvent {
+  string instance_id = 1;
+  string line = 2;
+  string logged_at = 3;
+  bool stream_end = 4; // true only when follow=false and all lines have been sent
+}
+
+message GovernanceStreamEvent {
+  string event_type = 1;
+  string proposal_id = 2;
+  string status = 3;
+  string timestamp = 4;
+}
+
+message CredentialRevocationEvent {
+  string vc_id = 1;
+  string reason = 2;
+  string revoked_at = 3;
+}

@@ -1,0 +1,166 @@
+syntax = "proto3";
+
+package jlucraft.consensus.v1;
+
+option java_package = "com.jlucraft.consensus.v1";
+option java_multiple_files = true;
+
+import "common.proto";
+import "events.proto";
+
+message RaftCommand {
+  oneof command {
+    ScheduleInstance schedule_instance = 1;
+    MigrateInstance migrate_instance = 2;
+    DestroyInstance destroy_instance = 3;
+    AddConsensusVoter add_consensus_voter = 4;
+    RemoveConsensusVoter remove_consensus_voter = 5;
+    GovernanceExecute governance_execute = 6;
+    OracleSettle oracle_settle = 7;
+    NodeScoreUpdate node_score_update = 8;
+    IssueConsensusCredential issue_consensus_credential = 9;
+    RevokeConsensusCredential revoke_consensus_credential = 10;
+    AcceptMigration accept_migration = 11;
+    AbortMigration abort_migration = 12;
+    OperationalEvent operational_event = 13;
+    RegisterPushEndpoint register_push_endpoint = 14;
+    UnregisterPushEndpoint unregister_push_endpoint = 15;
+    SetPushConfig set_push_config = 16;
+    EnqueuePushIntent enqueue_push_intent = 17;
+  }
+}
+
+message ScheduleInstance {
+  string instance_id = 1;
+  string target_peer_id = 2;
+  jlucraft.common.v1.ResourceRequest resources = 3;
+  string requested_by = 4;
+  string idempotency_key = 5;
+}
+
+message MigrateInstance {
+  string instance_id = 1;
+  string from_peer_id = 2;
+  string to_peer_id = 3;
+  string reason = 4;
+}
+
+message DestroyInstance {
+  string instance_id = 1;
+  string requested_by = 2;
+  string reason = 3;
+}
+
+message AddConsensusVoter {
+  string peer_id = 1;
+  string credential_id = 2;
+}
+
+message RemoveConsensusVoter {
+  string peer_id = 1;
+  string reason = 2;
+}
+
+message GovernanceExecute {
+  string proposal_id = 1;
+  string proposal_type = 2;
+  string executor = 3;
+}
+
+message ProposalSignature {
+  string public_key = 1;
+  string signature = 2;
+  string signed_at = 3;
+}
+
+message OracleSettle {
+  string date = 1;
+  string aggregated_report_hash = 2;
+  repeated ProposalSignature multisig_proof = 3;
+}
+
+message NodeScoreUpdate {
+  string peer_id = 1;
+  double uptime_score = 2;
+  double performance_score = 3;
+  double governance_score = 4;
+  double penalty = 5;
+}
+
+message IssueConsensusCredential {
+  string credential_id = 1;
+  string peer_id = 2;
+  uint64 group_id = 3;
+  string expires_at = 4;
+}
+
+message RevokeConsensusCredential {
+  string credential_id = 1;
+  string reason = 2;
+}
+
+message AcceptMigration {
+  string instance_id = 1;
+  string target_peer_id = 2;
+  string snapshot_key = 3;
+  uint64 migrate_raft_index = 4;
+}
+
+message AbortMigration {
+  string instance_id = 1;
+  string aborted_by = 2;
+  string reason = 3;
+  string rollback_to_peer_id = 4;
+}
+
+message OperationalEvent {
+  string event_type = 1;
+  map<string, string> attributes = 2;
+}
+
+message RegisterPushEndpoint {
+  string registry_key = 1;
+  string endpoint_hash = 2;
+  string endpoint_ciphertext = 3;
+  string endpoint_nonce = 4;
+  string endpoint_kid = 5;
+  string device_public_key = 6;
+  string owner_peer_id = 7;
+  string distributor_type = 8;
+  string registered_at = 9;
+}
+
+message UnregisterPushEndpoint {
+  string registry_key = 1;
+  string reason = 2;
+}
+
+message SetPushConfig {
+  string vapid_subject = 1;
+  string vapid_public_key = 2;
+  string vapid_private_key_ciphertext = 3;
+  string generated_at = 4;
+  string generated_by = 5;
+}
+
+message PushTarget {
+  oneof target {
+    AllRegistered all_registered = 1;
+    DevicePublicKey device_public_key = 2;
+    OwnerPeerId owner_peer_id = 3;
+  }
+}
+
+message AllRegistered {}
+message DevicePublicKey { string device_public_key = 1; }
+message OwnerPeerId { string owner_peer_id = 1; }
+
+message EnqueuePushIntent {
+  string intent_id = 1;
+  string event_type = 2;
+  string nonce = 3;
+  jlucraft.events.v1.PushNotification notification = 4;
+  PushTarget target = 5;
+  string created_at = 6;
+  string created_by = 7;
+}

@@ -1,0 +1,141 @@
+syntax = "proto3";
+
+package config.v1;
+
+option java_package = "com.jlucraft.config.v1";
+
+message ClusterConfig {
+    string cluster_id = 1;
+    uint32 schema_version = 2;
+    string issued_at = 3;
+    string expires_at = 4;
+    string issuer_peer_id = 5;
+    string payload_hash = 6;
+    string signature = 7;
+}
+
+message LauncherEntry {
+    ClusterConfig cluster = 1;
+    NetworkConfig network = 2;
+    ExternalConfig external = 3;
+    MuaAuthority mua_authority = 4;
+    RoomPolicy room_policy = 5;
+}
+
+message MuaAuthority {
+    string auth_server_url = 1;
+    string client_id = 2;
+    string scope = 3;
+}
+
+message RoomPolicy {
+    string image_prefix = 1;
+    uint32 cpu_cores = 2;
+    uint64 memory_gb = 3;
+    uint64 disk_gb = 4;
+    bool auto_restart = 5;
+    string admission_mode = 6;
+}
+
+message NetworkConfig {
+    repeated string transport_protocols = 1;
+    repeated string security_protocols = 2;
+    repeated string muxer_protocols = 3;
+    string identify_protocol = 4;
+    string dht_protocol = 5;
+    StreamProtocols stream_protocols = 6;
+    DiscoveryConfig discovery = 7;
+}
+
+message StreamProtocols {
+    string control = 1;
+    string instance = 2;
+    string events = 3;
+}
+
+message DiscoveryConfig {
+    string mdns_service = 1;
+    repeated string bootstrap_peers = 2;
+}
+
+message ExternalConfig {
+    string union_api_url = 1;
+    string skin_station_url = 2;
+    repeated string allowed_origins = 3;
+    string push_provider = 4;
+    repeated TurnServer turn_servers = 5;
+}
+
+message TurnServer {
+    string uri = 1;
+    string username = 2;
+    string credential = 3;
+}
+
+message WorkloadConfig {
+    string docker_endpoint = 1;
+    string docker_registry = 2;
+    string docker_network_mode = 3;
+    ImagePolicy image_policy = 4;
+    S3Config storage_s3 = 5;
+    CachePolicy cache_policy = 6;
+}
+
+message ImagePolicy {
+    repeated ApprovedImage approved_images = 1;
+    repeated ImageTemplateEntry template_allowlist = 2;
+}
+
+message ApprovedImage {
+    string image = 1;
+    string hash = 2;
+}
+
+message ImageTemplateEntry {
+    string pattern = 1;
+    string base_hash = 2;
+}
+
+message S3Config {
+    string endpoint = 1;
+    string bucket = 2;
+    string region = 3;
+    string access_key = 4;
+    string secret_key = 5;
+}
+
+message CachePolicy {
+    uint64 max_disk_gb = 1;
+    uint64 retention_hours = 2;
+}
+
+message GovernanceConfig {
+    repeated string genesis_pubkeys = 1;
+    repeated string trusted_issuers = 2;
+    ProposalThresholds proposal_thresholds = 3;
+    EmergencyRevokePolicy emergency_revoke_policy = 4;
+    JoinApprovalPolicy join_approval_policy = 5;
+}
+
+message ProposalThresholds {
+    uint32 voter_quorum_pct = 1;
+    uint32 approval_pct = 2;
+    uint32 cooldown_secs = 3;
+}
+
+message EmergencyRevokePolicy {
+    uint32 min_signers = 1;
+    uint32 max_age_secs = 2;
+}
+
+message JoinApprovalPolicy {
+    uint32 approval_ttl_secs = 1;
+    uint32 max_pending_requests = 2;
+}
+
+message ConfigFailure {
+    string source = 1;
+    string field_path = 2;
+    string reason = 3;
+    string impact = 4;
+}

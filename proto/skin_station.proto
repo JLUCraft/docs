@@ -1,0 +1,575 @@
+syntax = "proto3";
+
+package jlucraft.skin.v1;
+
+option java_package = "com.jlucraft.skin.v1";
+option java_multiple_files = true;
+
+message StationRequest {
+  string request_id = 1;
+  oneof body {
+    RegisterStart register_start = 10;
+    RegisterFinish register_finish = 11;
+    Login login = 12;
+    EmailVerify email_verify = 13;
+    CurrentUser current_user = 14;
+    UserPatch user_patch = 15;
+    PeerBind peer_bind = 16;
+    UserList user_list = 17;
+    UserGet user_get = 18;
+    UserAdminPatch user_admin_patch = 19;
+    TextureUpload texture_upload = 20;
+    TextureList texture_list = 21;
+    TextureGet texture_get = 22;
+    TextureDelete texture_delete = 23;
+    ProfileTextureSet profile_texture_set = 24;
+    ProfileList profile_list = 25;
+    ProfileCreate profile_create = 26;
+    PremiumBind premium_bind = 27;
+    PremiumCallback premium_callback = 28;
+    PremiumStatus premium_status = 29;
+    PremiumUnbind premium_unbind = 30;
+    PremiumCheck premium_check = 31;
+    PremiumAuthenticate premium_authenticate = 32;
+    YggMetadata ygg_metadata = 33;
+    YggAuthenticate ygg_authenticate = 34;
+    YggRefresh ygg_refresh = 35;
+    YggValidate ygg_validate = 36;
+    YggInvalidate ygg_invalidate = 37;
+    YggSignout ygg_signout = 38;
+    YggJoin ygg_join = 39;
+    YggHasJoined ygg_has_joined = 40;
+    YggProfile ygg_profile = 41;
+    YggProfileNames ygg_profile_names = 42;
+    MuaBind mua_bind = 43;
+    MuaBindingList mua_binding_list = 44;
+    MuaProfileLookup mua_profile_lookup = 45;
+    MuaMemberCheck mua_member_check = 46;
+    MuaTrustedSiteList mua_trusted_site_list = 47;
+    MuaTrustedSiteUpsert mua_trusted_site_upsert = 48;
+    MuaConfigGet mua_config_get = 49;
+    MuaConfigPatch mua_config_patch = 50;
+    UnionPublicKey union_public_key = 51;
+    UnionMemberStatus union_member_status = 52;
+    UnionServerListSet union_server_list_set = 53;
+    UnionPrivateKeySet union_private_key_set = 54;
+    UnionBackendKeySet union_backend_key_set = 55;
+    UnionSync union_sync = 56;
+    UnionUuidRemap union_uuid_remap = 57;
+    UnionPluginUpdate union_plugin_update = 58;
+    UnionDiagnose union_diagnose = 59;
+    UnionEmailQuery union_email_query = 60;
+    UnionMappedProfileLookup union_mapped_profile_lookup = 61;
+    UnionSkinLookup union_skin_lookup = 62;
+  }
+}
+
+message StationReply {
+  string request_id = 1;
+  Error error = 2;
+  oneof body {
+    EmailChallenge email_challenge = 10;
+    Session session = 11;
+    User user = 12;
+    Mutation mutation = 13;
+    Users users = 14;
+    Texture texture = 15;
+    Textures textures = 16;
+    bytes png = 17;
+    Profiles profiles = 18;
+    PlayerProfile profile = 19;
+    PremiumLink premium_link = 20;
+    PremiumState premium_state = 21;
+    YggdrasilMetadata ygg_metadata = 22;
+    YggdrasilProfile ygg_profile = 23;
+    YggdrasilProfiles ygg_profiles = 24;
+    MuaBinding mua_binding = 25;
+    MuaBindings mua_bindings = 26;
+    MuaProfile mua_profile = 27;
+    MuaMember mua_member = 28;
+    TrustedSites trusted_sites = 29;
+    TrustedSite trusted_site = 30;
+    MuaConfig mua_config = 31;
+    PublicKey public_key = 32;
+    UnionMemberState union_member_state = 33;
+    UnionSyncResult union_sync_result = 34;
+    UnionDiagnostic union_diagnostic = 35;
+    EmailQueryResult email_query_result = 36;
+    UnionMappedProfile union_mapped_profile = 37;
+    UnionServerList union_server_list = 38;
+  }
+}
+
+message Error {
+  string code = 1;
+  string message = 2;
+  map<string, string> details = 3;
+}
+
+message Mutation {
+  bool updated = 1;
+  bool deleted = 2;
+  bool added = 3;
+  bool bound = 4;
+  bool unbound = 5;
+  bool remapped = 6;
+  string status = 7;
+  string message = 8;
+  uint32 count = 9;
+}
+
+message Users {
+  repeated User items = 1;
+}
+
+message Textures {
+  repeated Texture items = 1;
+}
+
+message Profiles {
+  repeated PlayerProfile items = 1;
+}
+
+message YggdrasilProfiles {
+  repeated YggdrasilProfile items = 1;
+}
+
+message MuaBindings {
+  repeated MuaBinding items = 1;
+}
+
+message TrustedSites {
+  repeated TrustedSite items = 1;
+}
+
+message RegisterStart {
+  string username = 1;
+  string email = 2;
+}
+
+message RegisterFinish {
+  string username = 1;
+  string password = 2;
+  string email = 3;
+  string verification_token = 4;
+}
+
+message Login {
+  string username = 1;
+  string password = 2;
+}
+
+message EmailVerify {
+  string email = 1;
+}
+
+message CurrentUser {}
+
+message UserPatch {
+  string username = 1;
+  string peer_id = 2;
+  string peer_public_key = 3;
+  string peer_signature = 4;
+  bool clear_peer_id = 5;
+}
+
+message PeerBind {
+  string mua_access_token = 1;
+  string auth_server_url = 2;
+  string peer_id = 3;
+  bytes peer_public_key = 4;
+  bytes peer_signature = 5;
+}
+
+message UserList {
+  uint32 limit = 1;
+  uint32 offset = 2;
+}
+
+message UserGet {
+  string uuid = 1;
+}
+
+message UserAdminPatch {
+  string uuid = 1;
+  string role = 2;
+  string status = 3;
+  string club = 4;
+  bool clear_club = 5;
+}
+
+message EmailChallenge {
+  string message = 1;
+  string recipient = 2;
+  string token = 3;
+  uint64 expires_in = 4;
+}
+
+message Session {
+  string token = 1;
+  User user = 2;
+}
+
+message User {
+  string uuid = 1;
+  string username = 2;
+  string email = 3;
+  bool email_verified = 4;
+  string email_domain = 5;
+  string role = 6;
+  string status = 7;
+  string club = 8;
+  string peer_id = 9;
+  uint64 created_at = 10;
+  repeated PlayerProfile profiles = 11;
+  string minecraft_uuid = 12;
+  string minecraft_name = 13;
+}
+
+message TextureUpload {
+  string kind = 1;
+  string filename = 2;
+  bytes png = 3;
+}
+
+message TextureList {}
+
+message TextureGet {
+  string hash = 1;
+}
+
+message TextureDelete {
+  string uuid = 1;
+}
+
+message Texture {
+  string uuid = 1;
+  string hash = 2;
+  string kind = 3;
+  string url = 4;
+}
+
+message TextureRef {
+  string uuid = 1;
+  string hash = 2;
+  string url = 3;
+}
+
+message ProfileTextureSet {
+  string profile_uuid = 1;
+  string skin_texture_uuid = 2;
+  string cape_texture_uuid = 3;
+  string model = 4;
+}
+
+message ProfileList {}
+
+message ProfileCreate {
+  string name = 1;
+  string model = 2;
+}
+
+message PlayerProfile {
+  string id = 1;
+  string uuid = 2;
+  string name = 3;
+  string model = 4;
+  TextureRef skin = 5;
+  TextureRef cape = 6;
+}
+
+message PremiumBind {}
+
+message PremiumCallback {
+  string code = 1;
+  string state = 2;
+  string error_code = 3;
+  string error_description = 4;
+}
+
+message PremiumStatus {}
+
+message PremiumUnbind {}
+
+message PremiumCheck {
+  string uuid = 1;
+}
+
+message PremiumAuthenticate {
+  string code = 1;
+}
+
+message PremiumLink {
+  string auth_url = 1;
+}
+
+message PremiumState {
+  bool bound = 1;
+  bool unbound = 2;
+  string uuid = 3;
+  bool is_premium = 4;
+  string minecraft_uuid = 5;
+  string minecraft_name = 6;
+  uint64 bound_at = 7;
+}
+
+message YggMetadata {}
+
+message YggAuthenticate {
+  string username = 1;
+  string password = 2;
+  string client_token = 3;
+  bool request_user = 4;
+}
+
+message YggRefresh {
+  string access_token = 1;
+  string client_token = 2;
+}
+
+message YggValidate {
+  string access_token = 1;
+  string client_token = 2;
+}
+
+message YggInvalidate {
+  string access_token = 1;
+  string client_token = 2;
+}
+
+message YggSignout {
+  string username = 1;
+  string password = 2;
+}
+
+message YggJoin {
+  string access_token = 1;
+  string selected_profile = 2;
+  string server_id = 3;
+}
+
+message YggHasJoined {
+  string username = 1;
+  string server_id = 2;
+  string ip = 3;
+}
+
+message YggProfile {
+  string uuid = 1;
+  bool unsigned = 2;
+  string name = 3;
+}
+
+message YggProfileNames {
+  repeated string names = 1;
+}
+
+message YggdrasilMetadata {
+  string server_name = 1;
+  string implementation_name = 2;
+  string implementation_version = 3;
+  string homepage = 4;
+  string register = 5;
+  bool enable_profile_key = 6;
+  bool non_email_login = 7;
+  repeated string skin_domains = 8;
+  string signature_public_key = 9;
+}
+
+message YggdrasilProfile {
+  string id = 1;
+  string name = 2;
+  repeated TextureProperty properties = 3;
+  string club_code = 4;
+  string peer_id = 5;
+}
+
+message TextureProperty {
+  string name = 1;
+  string value = 2;
+  string signature = 3;
+}
+
+message MuaBind {
+  string source_site = 1;
+  string source_uuid = 2;
+  string mua_uuid = 3;
+}
+
+message MuaBindingList {}
+
+message MuaProfileLookup {
+  string uuid = 1;
+  string name = 2;
+  bool machine = 3;
+  bool server_to_server = 4;
+}
+
+message MuaMemberCheck {
+  string uuid = 1;
+  bool server_to_server = 2;
+}
+
+message MuaTrustedSiteList {}
+
+message MuaTrustedSiteUpsert {
+  string site_code = 1;
+  string site_name = 2;
+  string endpoint = 3;
+  string api_key = 4;
+}
+
+message MuaConfigGet {}
+
+message MuaConfigPatch {
+  string site_code = 1;
+  string site_name = 2;
+  string api_key = 3;
+  string union_endpoint = 4;
+  bool clear_api_key = 5;
+}
+
+message MuaBinding {
+  uint64 id = 1;
+  string mua_uuid = 2;
+  string source_site = 3;
+  bool verified = 4;
+  uint64 verified_at = 5;
+}
+
+message MuaProfile {
+  string id = 1;
+  string name = 2;
+  string source = 3;
+  string source_name = 4;
+  repeated TextureRef skins = 5;
+  repeated TextureRef capes = 6;
+  string club_code = 7;
+}
+
+message MuaMember {
+  string uuid = 1;
+  bool is_mua_member = 2;
+  string source = 3;
+  string source_name = 4;
+}
+
+message TrustedSite {
+  string site_code = 1;
+  string site_name = 2;
+  string endpoint = 3;
+  bool enabled = 4;
+}
+
+message MuaConfig {
+  string site_code = 1;
+  string site_name = 2;
+  bool api_key_configured = 3;
+  string union_endpoint = 4;
+  bool enabled = 5;
+}
+
+message UnionPublicKey {}
+
+message PublicKey {
+  string public_key_pem = 1;
+}
+
+message UnionMemberStatus {}
+
+message UnionServerListSet {
+  repeated UnionMember members = 1;
+}
+
+message UnionPrivateKeySet {
+  uint64 private_key_version = 1;
+  string private_key = 2;
+  string public_key = 3;
+}
+
+message UnionBackendKeySet {
+  string backend_key = 1;
+  string union_public_key = 2;
+}
+
+message UnionSync {}
+
+message UnionUuidRemap {
+  string from_uuid = 1;
+  string to_uuid = 2;
+}
+
+message UnionPluginUpdate {}
+
+message UnionDiagnose {}
+
+message UnionEmailQuery {
+  string email = 1;
+}
+
+message UnionMappedProfileLookup {
+  string uuid = 1;
+  string name = 2;
+}
+
+message UnionSkinLookup {
+  string uuid = 1;
+  string name = 2;
+}
+
+message UnionMemberState {
+  string yggdrasil_api_version = 1;
+  uint64 server_list_version = 2;
+  uint64 private_key_version = 3;
+  repeated string enabled_features = 4;
+}
+
+message UnionMember {
+  string code = 1;
+  string name = 2;
+  string url = 3;
+  string endpoint = 4;
+}
+
+message UnionServerList {
+  repeated UnionMember members = 1;
+  uint64 version = 2;
+}
+
+message UnionSyncResult {
+  bool synced = 1;
+  uint32 count = 2;
+  map<string, string> details = 3;
+}
+
+message UnionDiagnostic {
+  string endpoint = 1;
+  bool backend_key_configured = 2;
+  bool private_key_configured = 3;
+  bool public_key_configured = 4;
+  uint32 server_list_count = 5;
+}
+
+message EmailQueryResult {
+  bool found = 1;
+  repeated EmailPlayer players = 2;
+  uint32 count = 3;
+}
+
+message EmailPlayer {
+  string uuid = 1;
+  string username = 2;
+}
+
+message UnionMappedProfile {
+  string internal_id = 1;
+  string uuid = 2;
+  string name = 3;
+  BackendScopes backend_scopes = 4;
+  string club_code = 5;
+}
+
+message BackendScopes {
+  string bind = 1;
+  repeated string all = 2;
+}

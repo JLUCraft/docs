@@ -1,0 +1,677 @@
+syntax = "proto3";
+
+package jlucraft.control.v1;
+
+option java_package = "com.jlucraft.control.v1";
+option java_multiple_files = true;
+
+import "common.proto";
+import "events.proto";
+import "records.proto";
+import "resources.proto";
+
+message ControlRequest {
+  string request_id = 1;
+  jlucraft.common.v1.AuthContext auth = 2;
+  oneof body {
+    GetNodeRequest get_node = 10;
+    GetImageWhitelistRequest get_image_whitelist = 11;
+    GetClusterHealthRequest get_cluster_health = 12;
+    GetNetworkRequest get_network = 13;
+    GetConsensusRequest get_consensus = 14;
+    ListNodeScoresRequest list_node_scores = 15;
+    GetNodeScoreRequest get_node_score = 16;
+    ListLeasesRequest list_leases = 17;
+    GetLeaseRequest get_lease = 18;
+    RefreshLeaseRequest refresh_lease = 19;
+    TakeoverLeaseRequest takeover_lease = 20;
+    GetSchedulerStatusRequest get_scheduler_status = 21;
+    ListSchedulerNodesRequest list_scheduler_nodes = 22;
+    GetSchedulerNodeRequest get_scheduler_node = 23;
+    RecommendNodesRequest recommend_nodes = 24;
+    ListOracleReportsRequest list_oracle_reports = 25;
+    RollupOracleReportRequest rollup_oracle_report = 26;
+    ListAggregatedOracleReportsRequest list_aggregated_oracle_reports = 27;
+    GetAggregatedOracleReportRequest get_aggregated_oracle_report = 28;
+    GetOracleReportHashRequest get_oracle_report_hash = 29;
+    ListInstancesRequest list_instances = 30;
+    GetInstanceRequest get_instance = 31;
+    CreateInstanceRequest create_instance = 32;
+    StartInstanceRequest start_instance = 33;
+    StopInstanceRequest stop_instance = 34;
+    DeleteInstanceRequest delete_instance = 35;
+    MigrateInstanceRequest migrate_instance = 36;
+    AcceptMigrationRequest accept_migration = 37;
+    GetInstanceLogsRequest get_instance_logs = 38;
+    ListInstanceSnapshotsRequest list_instance_snapshots = 39;
+    UpdateAdmissionRequest update_admission = 40;
+    CheckAdmissionRequest check_admission = 41;
+    GetInstanceManifestRequest get_instance_manifest = 42;
+    GetInstanceLocationRequest get_instance_location = 43;
+    BatchInstanceOperationRequest batch_instance_operation = 44;
+    ListProposalsRequest list_proposals = 45;
+    GetProposalRequest get_proposal = 46;
+    CreateProposalRequest create_proposal = 47;
+    CreateProposalDraftRequest create_proposal_draft = 48;
+    SubmitProposalDraftRequest submit_proposal_draft = 49;
+    SignProposalRequest sign_proposal = 50;
+    RejectProposalRequest reject_proposal = 51;
+    ExecuteProposalRequest execute_proposal = 52;
+    ListAuditEntriesRequest list_audit_entries = 53;
+    VerifyAuditChainRequest verify_audit_chain = 54;
+    FinalizeAuditDayRequest finalize_audit_day = 55;
+    ListAuditAnomaliesRequest list_audit_anomalies = 56;
+    ListAlertsRequest list_alerts = 57;
+    GetAlertRequest get_alert = 58;
+    CreateAlertRequest create_alert = 59;
+    AcknowledgeAlertRequest acknowledge_alert = 60;
+    ResolveAlertRequest resolve_alert = 61;
+    ListTournamentsRequest list_tournaments = 62;
+    GetTournamentRequest get_tournament = 63;
+    CreateTournamentRequest create_tournament = 64;
+    UpdateTournamentStatusRequest update_tournament_status = 65;
+    RegisterForTournamentRequest register_for_tournament = 66;
+    ListTournamentMatchesRequest list_tournament_matches = 67;
+    GenerateTournamentScheduleRequest generate_tournament_schedule = 68;
+    SubmitMatchResultRequest submit_match_result = 69;
+    SpawnMatchRoomRequest spawn_match_room = 70;
+    ListTeamsRequest list_teams = 71;
+    CreateTeamRequest create_team = 72;
+    ListSeasonsRequest list_seasons = 73;
+    GetCurrentSeasonRequest get_current_season = 74;
+    GetSeasonRequest get_season = 75;
+    CreateSeasonRequest create_season = 76;
+    UpdateSeasonStatusRequest update_season_status = 77;
+    AddTournamentToSeasonRequest add_tournament_to_season = 78;
+    RemoveTournamentFromSeasonRequest remove_tournament_from_season = 79;
+    GetSeasonLeaderboardRequest get_season_leaderboard = 80;
+    ArchiveSeasonRequest archive_season = 81;
+    ListDevicesRequest list_devices = 82;
+    GetDeviceRequest get_device = 83;
+    RegisterDeviceRequest register_device = 84;
+    ListDevicesByOwnerRequest list_devices_by_owner = 85;
+    RevokeDeviceRequest revoke_device = 86;
+    EmergencyRevokeDeviceRequest emergency_revoke_device = 87;
+    CreateAuthChallengeRequest create_auth_challenge = 88;
+    NotifyAuthChallengeRequest notify_auth_challenge = 89;
+    VerifyAuthResponseRequest verify_auth_response = 90;
+    BindMuaPeerRequest bind_mua_peer = 91;
+    VerifyCredentialRequest verify_credential = 92;
+    ListTrustedIssuersRequest list_trusted_issuers = 93;
+    AddTrustedIssuerRequest add_trusted_issuer = 94;
+    ListRevokedCredentialsRequest list_revoked_credentials = 95;
+    RevokeCredentialRequest revoke_credential = 96;
+    ListConsensusSnapshotsRequest list_consensus_snapshots = 97;
+    GetConsensusCredentialRequest get_consensus_credential = 98;
+    QueryPlayerScoreProofRequest query_player_score_proof = 99;
+    RegisterPushEndpointRequest register_push_endpoint = 100;
+    GetPushConfigRequest get_push_config = 101;
+    InitPushConfigRequest init_push_config = 102;
+    GetPushPreferencesRequest get_push_preferences = 103;
+    PutPushPreferencesRequest put_push_preferences = 104;
+    ListMembersRequest list_members = 105;
+    GrantRoleRequest grant_role = 106;
+    IssueMemberCredentialRequest issue_member_credential = 107;
+    RevokeMemberRequest revoke_member = 108;
+    CreateCommandRequest create_command = 109;
+    RespondCommandRequest respond_command = 110;
+    ManageTournamentRequest manage_tournament = 111;
+    UpdateInstanceConfigRequest update_instance_config = 112;
+    GetInstanceSchedulingRequest get_instance_scheduling = 113;
+    SetInstanceSchedulingRequest set_instance_scheduling = 114;
+    SimulateInstanceSchedulingRequest simulate_instance_scheduling = 115;
+    CreateMatchDisputeRequest create_match_dispute = 116;
+    ListDisputesRequest list_disputes = 117;
+    GetDisputeRequest get_dispute = 118;
+    InvitePlayersRequest invite_players = 119;
+    ProbeMigrationRequest probe_migration = 120;
+    ResolveDidRequest resolve_did = 121;
+    SubmitJoinRequest submit_join = 122;
+    ListJoinRequestsRequest list_join_requests = 123;
+    ApproveJoinRequest approve_join = 124;
+    GetJoinStatusRequest get_join_status = 125;
+    SubscribeEventsRequest subscribe_events = 126;
+    ReportMetricsRequest report_metrics = 127;
+    StreamInstanceLogsRequest stream_instance_logs = 128;
+  }
+}
+
+message ControlResponse {
+  string request_id = 1;
+  jlucraft.common.v1.Error error = 2;
+  oneof body {
+    NodeResponse node = 10;
+    ImageWhitelistResponse image_whitelist = 11;
+    ClusterHealthResponse cluster_health = 12;
+    NetworkResponse network = 13;
+    ConsensusResponse consensus = 14;
+    NodeScoreListResponse node_scores = 15;
+    NodeScoreResponse node_score = 16;
+    LeaseListResponse leases = 17;
+    LeaseResponse lease = 18;
+    SchedulerStatusResponse scheduler_status = 19;
+    SchedulerNodeListResponse scheduler_nodes = 20;
+    SchedulerNodeResponse scheduler_node = 21;
+    RecommendationResponse recommendation = 22;
+    OracleReportListResponse oracle_reports = 23;
+    AggregatedOracleReportListResponse aggregated_oracle_reports = 24;
+    AggregatedOracleReportResponse aggregated_oracle_report = 25;
+    OracleReportHashResponse oracle_report_hash = 26;
+    InstanceListResponse instances = 27;
+    InstanceResponse instance = 28;
+    InstanceLogResponse instance_logs = 29;
+    InstanceSnapshotListResponse instance_snapshots = 30;
+    AdmissionCheckResponse admission_check = 31;
+    jlucraft.resources.v1.ResourceManifest instance_manifest = 32;
+    InstanceLocationResponse instance_location = 33;
+    BatchInstanceOperationResponse batch_instance_operation = 34;
+    ProposalListResponse proposals = 35;
+    ProposalResponse proposal = 36;
+    AuditEntryListResponse audit_entries = 37;
+    AuditVerificationResponse audit_verification = 38;
+    AuditAnomalyListResponse audit_anomalies = 39;
+    AlertListResponse alerts = 40;
+    AlertResponse alert = 41;
+    TournamentListResponse tournaments = 42;
+    TournamentResponse tournament = 43;
+    MatchListResponse matches = 44;
+    MatchResponse match = 45;
+    TeamListResponse teams = 46;
+    TeamResponse team = 47;
+    SeasonListResponse seasons = 48;
+    SeasonResponse season = 49;
+    LeaderboardResponse leaderboard = 50;
+    DeviceListResponse devices = 51;
+    DeviceResponse device = 52;
+    AuthChallengeResponse auth_challenge = 53;
+    AuthResultResponse auth_result = 54;
+    CredentialVerificationResponse credential_verification = 55;
+    TrustedIssuerListResponse trusted_issuers = 56;
+    RevokedCredentialListResponse revoked_credentials = 57;
+    ConsensusSnapshotListResponse consensus_snapshots = 58;
+    ConsensusCredentialResponse consensus_credential = 59;
+    PlayerScoreProofResponse player_score_proof = 60;
+    PushRegisterResponse push_register = 61;
+    PushConfigResponse push_config = 62;
+    PushPreferencesResponse push_preferences = 63;
+    MemberListResponse members = 64;
+    MemberMutationResponse member_mutation = 65;
+    CommandChallengeResponse command_challenge = 66;
+    CommandResultResponse command_result = 67;
+    SchedulingConstraintsResponse scheduling_constraints = 68;
+    SchedulingSimulationResponse scheduling_simulation = 69;
+    DisputeListResponse disputes = 70;
+    DisputeResponse dispute = 71;
+    InvitePlayersResponse invite_players = 72;
+    MigrationProbeResponse migration_probe = 73;
+    DidResolutionResponse did_resolution = 74;
+    JoinRequestListResponse join_requests = 75;
+    JoinStatusResponse join_status = 76;
+    SubscribeEventsResponse subscribe_events = 77;
+    OracleMetricsResponse oracle_metrics = 78;
+    StreamInstanceLogsResponse stream_instance_logs = 79;
+  }
+}
+
+message GetNodeRequest {}
+message GetImageWhitelistRequest {}
+message GetClusterHealthRequest {}
+message GetNetworkRequest {}
+message GetConsensusRequest {}
+message ListNodeScoresRequest {}
+message GetNodeScoreRequest { string peer_id = 1; }
+message ListLeasesRequest {}
+message GetLeaseRequest { string instance_id = 1; }
+message RefreshLeaseRequest { string instance_id = 1; string holder_peer_id = 2; uint64 ttl_secs = 3; }
+message TakeoverLeaseRequest { string instance_id = 1; string new_holder_peer_id = 2; }
+message GetSchedulerStatusRequest {}
+message ListSchedulerNodesRequest {}
+message GetSchedulerNodeRequest { string peer_id = 1; }
+message RecommendNodesRequest { uint32 cpu_cores = 1; uint64 memory_mb = 2; uint64 disk_mb = 3; uint32 limit = 4; }
+message ListOracleReportsRequest { string date = 1; }
+message RollupOracleReportRequest { string date = 1; }
+message ListAggregatedOracleReportsRequest {}
+message GetAggregatedOracleReportRequest { string date = 1; }
+message GetOracleReportHashRequest { string date = 1; }
+
+message ListInstancesRequest { string status = 1; string owner = 2; string club = 3; }
+message GetInstanceRequest { string instance_id = 1; }
+message CreateInstanceRequest {
+  string name = 1;
+  string kind = 2;
+  string owner = 3;
+  string club = 4;
+  RuntimeSpec runtime = 5;
+  jlucraft.common.v1.ResourceRequest resources = 6;
+  bool auto_restart = 7;
+  AdmissionPolicy admission = 8;
+  string restore_from_snapshot = 9;
+}
+message StartInstanceRequest { string instance_id = 1; }
+message StopInstanceRequest { string instance_id = 1; }
+message DeleteInstanceRequest { string instance_id = 1; }
+message MigrateInstanceRequest { string instance_id = 1; string target_peer_id = 2; string trigger = 3; }
+message AcceptMigrationRequest { string instance_id = 1; string snapshot_key = 2; uint64 raft_index = 3; }
+message GetInstanceLogsRequest { string instance_id = 1; uint32 tail_lines = 2; }
+message ListInstanceSnapshotsRequest { string instance_id = 1; }
+message UpdateAdmissionRequest { string instance_id = 1; AdmissionPolicy admission = 2; }
+message CheckAdmissionRequest { string instance_id = 1; string player_peer_id = 2; string player_club = 3; bool has_vc = 4; }
+message GetInstanceManifestRequest { string instance_id = 1; }
+message GetInstanceLocationRequest { string instance_id = 1; }
+message BatchInstanceOperationRequest {
+  string operation = 1;
+  repeated string instance_ids = 2;
+  string target_peer_id = 3;
+  string canonical_batch_hash = 4;
+}
+
+message RuntimeSpec {
+  string image = 1;
+  string mc_version = 2;
+  map<string, string> env = 3;
+  map<string, string> labels = 4;
+}
+
+message AdmissionPolicy {
+  string mode = 1;
+  repeated string allowed_players = 2;
+  repeated string allowed_clubs = 3;
+}
+
+message Instance {
+  string id = 1;
+  string name = 2;
+  string kind = 3;
+  string owner = 4;
+  string club = 5;
+  string host_peer_id = 6;
+  string status = 7;
+  string created_at = 8;
+  string updated_at = 9;
+  uint32 player_count = 10;
+  string migration_target = 11;
+  RuntimeSpec runtime = 12;
+  jlucraft.common.v1.ResourceRequest resources = 13;
+  AdmissionPolicy admission = 14;
+  string mode = 15;
+  uint32 max_players = 16;
+  string version = 17;
+}
+
+message InstanceOperationResult {
+  string instance_id = 1;
+  bool success = 2;
+  string error = 3;
+}
+
+message Lease {
+  string instance_id = 1;
+  string holder_peer_id = 2;
+  string token_hash = 3;
+  string expires_at = 4;
+  string pending_migration_target = 5;
+}
+
+message SchedulerNode {
+  string peer_id = 1;
+  uint32 cpu_cores = 2;
+  uint64 memory_mb = 3;
+  uint64 disk_mb = 4;
+  uint32 running_instances = 5;
+  double score = 6;
+  map<string, string> labels = 7;
+}
+
+message NodeScore {
+  string peer_id = 1;
+  double uptime_score = 2;
+  double performance_score = 3;
+  double governance_score = 4;
+  double penalty = 5;
+}
+
+message ListProposalsRequest { string status = 1; }
+message GetProposalRequest { string proposal_id = 1; }
+message CreateProposalRequest { string proposal_type = 1; string title = 2; string description = 3; bytes payload = 4; }
+message CreateProposalDraftRequest { string proposal_type = 1; string title = 2; string description = 3; bytes payload = 4; }
+message SubmitProposalDraftRequest { string proposal_id = 1; }
+message SignProposalRequest { string proposal_id = 1; string public_key = 2; string signature = 3; }
+message RejectProposalRequest { string proposal_id = 1; string reason = 2; }
+message ExecuteProposalRequest { string proposal_id = 1; }
+
+message Proposal {
+  string id = 1;
+  string proposal_type = 2;
+  string title = 3;
+  string description = 4;
+  string status = 5;
+  string proposer = 6;
+  string created_at = 7;
+  string updated_at = 8;
+  repeated ProposalSignature signatures = 9;
+  bytes payload = 10;
+}
+
+message ProposalSignature {
+  string public_key = 1;
+  string signature = 2;
+  string signed_at = 3;
+}
+
+message ListAuditEntriesRequest { string cmd_type = 1; jlucraft.common.v1.PageRequest page = 2; }
+message VerifyAuditChainRequest { string date = 1; }
+message FinalizeAuditDayRequest { string date = 1; }
+message ListAuditAnomaliesRequest {}
+
+message AuditEntry {
+  string id = 1;
+  string actor = 2;
+  string command = 3;
+  string target = 4;
+  string payload_hash = 5;
+  string prev_hash = 6;
+  string outcome = 7;
+  string created_at = 8;
+}
+
+message AuditAnomaly {
+  string id = 1;
+  string rule = 2;
+  string description = 3;
+  string severity = 4;
+}
+
+message ListAlertsRequest { string severity = 1; bool include_resolved = 2; }
+message GetAlertRequest { string alert_id = 1; }
+message CreateAlertRequest { string alert_type = 1; string message = 2; string severity = 3; string target = 4; }
+message AcknowledgeAlertRequest { string alert_id = 1; }
+message ResolveAlertRequest { string alert_id = 1; }
+
+message Alert {
+  string id = 1;
+  string alert_type = 2;
+  string message = 3;
+  string severity = 4;
+  string status = 5;
+  string target = 6;
+  string created_at = 7;
+  string resolved_at = 8;
+}
+
+message ListTournamentsRequest { string status = 1; }
+message GetTournamentRequest { string tournament_id = 1; }
+message CreateTournamentRequest {
+  string name = 1;
+  string game_type = 2;
+  string mode = 3;
+  TournamentSchedule schedule = 4;
+  ScoringRules scoring = 5;
+  uint32 min_member_score = 6;
+  uint32 max_participants = 7;
+}
+message UpdateTournamentStatusRequest { string tournament_id = 1; string status = 2; }
+message RegisterForTournamentRequest { string tournament_id = 1; string player_id = 2; }
+message ListTournamentMatchesRequest { string tournament_id = 1; }
+message GenerateTournamentScheduleRequest { string tournament_id = 1; }
+message SubmitMatchResultRequest { string match_id = 1; MatchResult result = 2; }
+message SpawnMatchRoomRequest { string match_id = 1; }
+message ManageTournamentRequest { string tournament_id = 1; string action = 2; }
+
+message Tournament {
+  string id = 1;
+  string name = 2;
+  string game_type = 3;
+  string mode = 4;
+  TournamentSchedule schedule = 5;
+  ScoringRules scoring = 6;
+  uint32 min_member_score = 7;
+  uint32 max_participants = 8;
+  uint32 participant_count = 9;
+  string status = 10;
+  string created_at = 11;
+  string created_by = 12;
+}
+
+message TournamentSchedule {
+  string registration_open = 1;
+  string registration_close = 2;
+  repeated MatchSchedule matches = 3;
+}
+
+message MatchSchedule {
+  uint32 round = 1;
+  string datetime = 2;
+  string map = 3;
+}
+
+message ScoringRules {
+  int32 win = 1;
+  int32 kill = 2;
+  double survive_minute = 3;
+  int32 placement_1 = 4;
+  int32 placement_2 = 5;
+  int32 placement_3 = 6;
+}
+
+message Match {
+  string id = 1;
+  string tournament_id = 2;
+  uint32 round = 3;
+  repeated string participants = 4;
+  string instance_id = 5;
+  MatchResult result = 6;
+  string status = 7;
+  string scheduled_at = 8;
+}
+
+message MatchResult {
+  repeated PlayerResult rankings = 1;
+}
+
+message PlayerResult {
+  string player_id = 1;
+  double score = 2;
+  int32 kills = 3;
+  int32 deaths = 4;
+  double survive_minutes = 5;
+}
+
+message ListTeamsRequest {}
+message CreateTeamRequest { string name = 1; repeated string members = 2; }
+message Team { string id = 1; string name = 2; repeated string members = 3; int32 total_score = 4; repeated string tournament_ids = 5; }
+
+message ListSeasonsRequest {}
+message GetCurrentSeasonRequest {}
+message GetSeasonRequest { string season_id = 1; }
+message CreateSeasonRequest { string name = 1; string starts_at = 2; string ends_at = 3; }
+message UpdateSeasonStatusRequest { string season_id = 1; string status = 2; }
+message AddTournamentToSeasonRequest { string season_id = 1; string tournament_id = 2; }
+message RemoveTournamentFromSeasonRequest { string season_id = 1; string tournament_id = 2; }
+message GetSeasonLeaderboardRequest { string season_id = 1; }
+message ArchiveSeasonRequest { string season_id = 1; }
+message Season { string id = 1; string name = 2; string status = 3; string starts_at = 4; string ends_at = 5; repeated string tournament_ids = 6; }
+message LeaderboardEntry { string player_id = 1; double score = 2; uint32 rank = 3; }
+
+message ListDevicesRequest {}
+message GetDeviceRequest { string public_key = 1; }
+message RegisterDeviceRequest { string public_key = 1; string owner_peer_id = 2; string device_name = 3; }
+message ListDevicesByOwnerRequest { string owner_peer_id = 1; }
+message RevokeDeviceRequest { string public_key = 1; string reason = 2; }
+message EmergencyRevokeDeviceRequest { string public_key = 1; string reason = 2; }
+message Device { string public_key = 1; string owner_peer_id = 2; string device_name = 3; string status = 4; string registered_at = 5; string revoked_at = 6; }
+
+message CreateAuthChallengeRequest { string cmd_type = 1; bytes payload = 2; string public_key = 3; }
+message NotifyAuthChallengeRequest { string challenge_id = 1; string target_peer_id = 2; }
+message VerifyAuthResponseRequest { string challenge_id = 1; string nonce = 2; string signature_alg = 3; string signature = 4; }
+message BindMuaPeerRequest { string access_token = 1; string auth_server_url = 2; string peer_id = 3; bytes peer_public_key = 4; bytes peer_signature = 5; }
+
+message AuthChallengeResponse {
+  string challenge_id = 1;
+  string nonce = 2;
+  string issued_at = 3;
+  string expires_at = 4;
+  uint64 ttl_seconds = 5;
+  string cmd_type = 6;
+  string payload_hash = 7;
+  string human_summary = 8;
+  string risk_level = 9;
+  string required_role = 10;
+}
+
+message AuthResultResponse { bool verified = 1; string actor_peer_id = 2; string role = 3; }
+
+message VerifyCredentialRequest { bytes credential = 1; }
+message ListTrustedIssuersRequest {}
+message AddTrustedIssuerRequest { string issuer = 1; string public_key = 2; }
+message ListRevokedCredentialsRequest {}
+message RevokeCredentialRequest { string credential_id = 1; string subject_did = 2; string reason = 3; }
+message CredentialVerificationResponse { bool valid = 1; string subject_did = 2; string issuer = 3; string reason = 4; }
+message TrustedIssuerListResponse { repeated string issuers = 1; }
+message RevokedCredentialListResponse { repeated string credential_ids = 1; }
+
+message ListConsensusSnapshotsRequest {}
+message GetConsensusCredentialRequest {}
+message QueryPlayerScoreProofRequest { string player_id = 1; }
+message PlayerScoreProofResponse { string player_id = 1; double score = 2; string merkle_root = 3; repeated string proof = 4; }
+
+message RegisterPushEndpointRequest { string endpoint = 1; string device_public_key = 2; string owner_peer_id = 3; }
+message GetPushConfigRequest {}
+message InitPushConfigRequest { string vapid_subject = 1; }
+message GetPushPreferencesRequest {}
+message PutPushPreferencesRequest { repeated string enabled_event_types = 1; bool dnd_enabled = 2; uint32 dnd_start_hour = 3; uint32 dnd_end_hour = 4; string device_id = 5; }
+message PushRegisterResponse { bool registered = 1; string endpoint_hash = 2; }
+message PushConfigResponse { bool configured = 1; string vapid_public_key = 2; string vapid_subject = 3; }
+message PushPreferencesResponse { repeated string enabled_event_types = 1; bool dnd_enabled = 2; uint32 dnd_start_hour = 3; uint32 dnd_end_hour = 4; string device_id = 5; }
+
+message ListMembersRequest {}
+message GrantRoleRequest { string subject_did = 1; string role = 2; }
+message IssueMemberCredentialRequest { string subject_did = 1; string credential_type = 2; uint64 group_id = 3; string expires_at = 4; }
+message RevokeMemberRequest { string subject_did = 1; string reason = 2; }
+message Member { string subject_did = 1; string role = 2; string credential_status = 3; }
+message MemberMutationResponse { string subject_did = 1; string status = 2; string proposal_id = 3; }
+
+message CreateCommandRequest { string cmd_type = 1; bytes payload = 2; string public_key = 3; }
+message RespondCommandRequest { string challenge_id = 1; VerifyAuthResponseRequest response = 2; }
+message CommandChallengeResponse { AuthChallengeResponse challenge = 1; }
+message CommandResultResponse { bool accepted = 1; string result = 2; }
+
+message UpdateInstanceConfigRequest { string instance_id = 1; map<string, string> config = 2; }
+message GetInstanceSchedulingRequest { string instance_id = 1; }
+message SetInstanceSchedulingRequest { string instance_id = 1; SchedulingConstraints constraints = 2; }
+message SimulateInstanceSchedulingRequest { string instance_id = 1; SchedulingConstraints constraints = 2; }
+message SchedulingConstraints { string preferred_peer_id = 1; repeated string avoid_peer_ids = 2; map<string, string> labels = 3; }
+message SchedulingSimulationResponse { string selected_peer_id = 1; repeated SchedulerNode candidates = 2; }
+
+message CreateMatchDisputeRequest { string tournament_id = 1; string match_id = 2; string reason = 3; repeated string evidence_urls = 4; }
+message ListDisputesRequest { string tournament_id = 1; }
+message GetDisputeRequest { string dispute_id = 1; }
+message Dispute { string dispute_id = 1; string tournament_id = 2; string match_id = 3; string status = 4; string reason = 5; repeated string evidence_urls = 6; string submitted_by = 7; string resolution = 8; string created_at = 9; string resolved_at = 10; string resolved_by = 11; }
+
+message InvitePlayersRequest { string instance_id = 1; string topic = 2; repeated string invitees = 3; string message = 4; }
+message ProbeMigrationRequest { string instance_id = 1; string source_peer_id = 2; }
+message ResolveDidRequest { string did = 1; }
+message SubmitJoinRequest { jlucraft.records.v1.JoinRequest request = 1; }
+message ListJoinRequestsRequest {}
+message ApproveJoinRequest { string peer_id = 1; }
+message GetJoinStatusRequest { string peer_id = 1; }
+message SubscribeEventsRequest { repeated string topics = 1; }
+
+message NodeResponse { string peer_id = 1; string status = 2; repeated string listen_addrs = 3; map<string, string> labels = 4; }
+message ImageWhitelistResponse { repeated string images = 1; }
+message ClusterHealthResponse { string status = 1; uint32 node_count = 2; uint32 running_instances = 3; uint32 alert_count = 4; }
+message NetworkResponse { repeated jlucraft.records.v1.NodeAnnouncement nodes = 1; repeated jlucraft.records.v1.InstanceRecord instances = 2; }
+message ConsensusResponse { string role = 1; string leader_peer_id = 2; uint64 applied_index = 3; repeated string voters = 4; repeated string learners = 5; }
+message NodeScoreListResponse { repeated NodeScore scores = 1; }
+message NodeScoreResponse { NodeScore score = 1; }
+message LeaseListResponse { repeated Lease leases = 1; }
+message LeaseResponse { Lease lease = 1; }
+message SchedulerStatusResponse { string status = 1; uint32 known_nodes = 2; }
+message SchedulerNodeListResponse { repeated SchedulerNode nodes = 1; }
+message SchedulerNodeResponse { SchedulerNode node = 1; }
+message RecommendationResponse { repeated SchedulerNode candidates = 1; string selected_peer_id = 2; }
+message OracleReportListResponse { repeated bytes reports = 1; }
+message AggregatedOracleReportListResponse { repeated bytes reports = 1; }
+message AggregatedOracleReportResponse { bytes report = 1; }
+message OracleReportHashResponse { string hash = 1; }
+message InstanceListResponse { repeated Instance instances = 1; }
+message InstanceResponse { Instance instance = 1; }
+message InstanceLogResponse { string content = 1; }
+message InstanceSnapshotListResponse { repeated string snapshot_keys = 1; }
+message AdmissionCheckResponse { bool allowed = 1; string reason = 2; }
+message InstanceLocationResponse { string peer_id = 1; repeated string listen_addrs = 2; }
+message BatchInstanceOperationResponse { repeated InstanceOperationResult results = 1; string canonical_batch_hash = 2; }
+message ProposalListResponse { repeated Proposal proposals = 1; }
+message ProposalResponse { Proposal proposal = 1; }
+message AuditEntryListResponse { repeated AuditEntry entries = 1; jlucraft.common.v1.PageInfo page = 2; }
+message AuditVerificationResponse { bool valid = 1; string root_hash = 2; repeated string errors = 3; }
+message AuditAnomalyListResponse { repeated AuditAnomaly anomalies = 1; }
+message AlertListResponse { repeated Alert alerts = 1; }
+message AlertResponse { Alert alert = 1; }
+message TournamentListResponse { repeated Tournament tournaments = 1; }
+message TournamentResponse { Tournament tournament = 1; }
+message MatchListResponse { repeated Match matches = 1; }
+message MatchResponse { Match match = 1; }
+message TeamListResponse { repeated Team teams = 1; }
+message TeamResponse { Team team = 1; }
+message SeasonListResponse { repeated Season seasons = 1; }
+message SeasonResponse { Season season = 1; }
+message LeaderboardResponse { repeated LeaderboardEntry entries = 1; }
+message DeviceListResponse { repeated Device devices = 1; }
+message DeviceResponse { Device device = 1; }
+message ConsensusSnapshotListResponse { repeated string snapshot_keys = 1; }
+message ConsensusCredentialResponse { bytes credential = 1; }
+message MemberListResponse { repeated Member members = 1; }
+message SchedulingConstraintsResponse { SchedulingConstraints constraints = 1; }
+message DisputeListResponse { repeated Dispute disputes = 1; }
+message DisputeResponse { Dispute dispute = 1; }
+message InvitePlayersResponse { uint32 invited_count = 1; bool wake_requested = 2; bool event_emitted = 3; repeated string missing_recipients = 4; }
+message MigrationProbeResponse { string status = 1; string target_peer_id = 2; repeated string supported_protocols = 3; uint64 available_disk_mb = 4; double cpu_headroom_pct = 5; uint64 memory_headroom_mb = 6; uint64 estimated_rtt_ms = 7; string reason = 8; string checked_at = 9; }
+message DidResolutionResponse { bytes did_document = 1; string error = 2; }
+message JoinRequestListResponse { repeated jlucraft.records.v1.JoinRequest requests = 1; }
+message JoinStatusResponse { string status = 1; string peer_id = 2; string proposal_id = 3; }
+message SubscribeEventsResponse {
+  repeated string accepted_topics = 1;
+  jlucraft.events.v1.EventEnvelope event = 2;
+}
+
+// ReportMetrics: oracle nodes submit their daily per-player metrics.
+// Auth: requires ConsensusCredential on the submitting node.
+message ReportMetricsRequest {
+  string date = 1;                          // ISO-8601 date, e.g. "2026-05-11"
+  repeated PlayerMetricEntry entries = 2;   // one entry per player observed today
+  string log_merkle_root = 3;              // Merkle root of raw log entries retained for 7 days
+  uint64 log_count = 4;                    // number of raw log entries summarised
+}
+
+message PlayerMetricEntry {
+  string player_id = 1;          // PeerID or Yggdrasil UUID
+  double online_minutes = 2;
+  uint64 action_count = 3;       // block place/break + movement ticks
+  uint64 social_count = 4;       // chat messages + player-interactions
+  double build_delta = 5;        // block-level build volume change
+}
+
+message OracleMetricsResponse {
+  bool accepted = 1;
+  string report_hash = 2;        // SHA-256 of the accepted report
+  uint32 reports_received = 3;   // total submissions for this date so far
+  bool rollup_triggered = 4;     // true when quorum reached and rollup began
+}
+
+// StreamInstanceLogs: open a libp2p stream that delivers log lines from a
+// running instance. The server sends StreamInstanceLogsResponse frames until
+// the stream is closed by either side.
+// Auth: requires admin-level VC.
+message StreamInstanceLogsRequest {
+  string instance_id = 1;
+  bool follow = 2;           // if true, keep streaming new lines until stream close
+  uint32 tail_lines = 3;     // initial back-log lines to emit before following; 0 = none
+  string keyword_filter = 4; // optional substring filter applied server-side
+}
+
+message StreamInstanceLogsResponse {
+  string instance_id = 1;
+  string line = 2;
+  string logged_at = 3;      // RFC-3339 timestamp
+  bool stream_end = 4;       // true on final frame when follow=false
+}

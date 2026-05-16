@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package jlucraft.resources.v1;
+
+option java_package = "com.jlucraft.resources.v1";
+option java_multiple_files = true;
+
+message ResourceManifest {
+  uint32 version = 1;
+  string instance_id = 2;
+  repeated ManifestFile files = 3;
+}
+
+message ManifestFile {
+  string path = 1;
+  string hash = 2;
+  uint64 size = 3;
+  bool required = 4;
+  repeated ManifestChunk chunks = 5;
+}
+
+message ManifestChunk {
+  uint32 index = 1;
+  uint64 offset = 2;
+  uint64 size = 3;
+  string hash = 4;
+}
+
+message ChunkRequest {
+  string chunk_hash = 1;
+  string instance_id = 2;
+}
+
+message ChunkResponse {
+  string chunk_hash = 1;
+  uint64 size = 2;
+  bytes data = 3;
+  string error = 4;
+}
+
+message ResourceProviderAd {
+  string peer_id = 1;
+  repeated string chunk_hashes = 2;
+  string published_at = 3;
+  bytes public_key = 4;
+  bytes signature = 5;
+}
+
+message CacheEntry {
+  string hash = 1;
+  uint64 size = 2;
+  string last_accessed_at = 3;
+  string integrity_hash = 4;
+}
+
+message CacheInventory {
+  repeated CacheEntry entries = 1;
+  uint64 total_size = 2;
+}
